@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CeleShop MLBB Diamonds</title>
+<style>
+body { font-family: Arial; padding: 20px; background: #f0f2f5; color: #333; }
+h1,h2{text-align:center;}
+#searchBar{display:block;margin:0 auto 20px;width:50%;padding:10px;font-size:16px;border-radius:5px;border:1px solid #ccc;}
+#products{display:flex;flex-wrap:wrap;justify-content:center;}
+.product{
+  border:1px solid #ccc;border-radius:10px;padding:15px;margin:10px;width:200px;background:#fff;
+  box-shadow:0 2px 5px rgba(0,0,0,0.1);transition:transform 0.2s, box-shadow 0.2s;text-align:center;
+}
+.product:hover{transform:translateY(-5px);box-shadow:0 5px 15px rgba(0,0,0,0.2);}
+.product img{width:160px;height:160px;object-fit:cover;margin-bottom:5px;border-radius:5px;cursor:pointer;}
+button{padding:5px 10px;margin-top:5px;cursor:pointer;border:none;border-radius:5px;background:#007bff;color:white;transition:background 0.2s;}
+button:hover{background:#0056b3;}
+#cart{border:2px solid #007bff;border-radius:10px;padding:15px;margin-top:20px;background:#e7f1ff;max-width:500px;margin-left:auto;margin-right:auto;}
+#checkout{display:block;margin:20px auto;font-size:16px;font-weight:bold;background:#28a745;}
+#checkout:hover{background:#1e7e34;}
+.remove-btn{background:#dc3545;margin-left:10px;}
+.remove-btn:hover{background:#a71d2a;}
+#paymentInfo{max-width:500px;margin:20px auto;padding:15px;border:2px solid #007bff;border-radius:10px;background:#fff;}
+#paymentInfo input, #paymentInfo textarea{width:100%;padding:8px;margin:5px 0 10px;border-radius:5px;border:1px solid #ccc;}
+#paymentInfo .clickable{color:#007bff;cursor:pointer;text-decoration:underline;}
+#chatBox{position:fixed;bottom:20px;right:20px;width:300px;height:400px;background:#fff;border:2px solid #007bff;border-radius:10px;display:flex;flex-direction:column;}
+#chatMessages{flex:1;padding:10px;overflow-y:auto;border-bottom:1px solid #ccc;}
+#chatInput{display:flex;}
+#chatInput input{flex:1;padding:8px;border:none;border-top-left-radius:0;border-bottom-left-radius:10px;}
+#chatInput button{padding:8px;border:none;background:#007bff;color:#fff;border-top-right-radius:10px;border-bottom-right-radius:10px;cursor:pointer;}
+#chatInput button:hover{background:#0056b3;}
+#previewOverlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);justify-content:center;align-items:center;z-index:999;}
+#previewOverlay img{max-width:90%;max-height:90%;border-radius:10px;}
+</style>
+</head>
+<body>
+
+<h1>🔥 MLBB Diamonds Seller Shop 🔥</h1>
+<p style="text-align:center;">Mobile Legends Bang Bang 💎 Diamond Packages</p>
+
+<input type="text" id="searchBar" placeholder="Search Diamonds...">
+
+<div id="products"></div>
+
+<h2>🛒 My Cart</h2>
+<div id="cart">Cart is empty</div>
+
+<div id="paymentInfo">
+  <label>WavePay Phone:</label>
+  <span class="clickable" onclick="copyToClipboard('09954204473')">09954204473 📋</span>
+  <input type="hidden" id="wavepay" value="09954204473">
+  
+  <label>KBZ Pay Phone:</label>
+  <span class="clickable" onclick="copyToClipboard('09940790449')">09940790449 📋</span>
+  <input type="hidden" id="kpay" value="09940790449">
+  
+  <label>MLBB ID:</label>
+  <input type="text" id="mlbbid" placeholder="Enter your MLBB ID (e.g. 12345678)">
+  
+  <label>Zone ID:</label>
+  <input type="text" id="zoneid" placeholder="Enter your Zone ID (e.g. 1234)">
+  
+  <label>Note / Message:</label>
+  <textarea id="chatNote" placeholder="Add any note for seller" rows="3"></textarea>
+</div>
+
+<button id="checkout">💰 ဝယ်မယ် (Buy Now)</button>
+
+<!-- Messenger Chat Box -->
+<div id="chatBox">
+  <div id="chatMessages"></div>
+  <div id="chatInput">
+    <input type="text" id="msgInput" placeholder="Type a message...">
+    <button onclick="sendChat()">Send</button>
+  </div>
+</div>
+
+<!-- Image Preview -->
+<div id="previewOverlay" onclick="hidePreview()">
+  <img id="previewImg" src="">
+</div>
+
+<script>
+// Telegram Info
+const BOT_TOKEN = "8418532957:AAF7zhJn9vCf2mSSqBjXIvfS5HRfHTqvY5M";
+const CHAT_ID = "1733081075";
+
+// MLBB Diamond Packages
+const PRODUCTS = [
+  {id:1, name:"86 Diamonds", price:2800, image:"images/mlbb1.jpg"},
+  {id:2, name:"170 Diamonds", price:5600, image:"images/mlbb2.jpg"},
+  {id:3, name:"257 Diamonds", price:8200, image:"images/mlbb3.jpg"},
+  {id:4, name:"344 Diamonds", price:10900, image:"images/mlbb4.jpg"},
+  {id:5, name:"429 Diamonds", price:13600, image:"images/mlbb5.jpg"},
+  {id:6, name:"514 Diamonds", price:16200, image:"images/mlbb6.jpg"},
+  {id:7, name:"600 Diamonds", price:18800, image:"images/mlbb7.jpg"},
+  {id:8, name:"706 Diamonds", price:21800, image:"images/mlbb8.jpg"},
+  {id:9, name:"878 Diamonds", price:26500, image:"images/mlbb9.jpg"},
+  {id:10, name:"1000 Diamonds", price:29900, image:"images/mlbb10.jpg"},
+];
+
+let CART={};
+
+// Render Products
+const productsDiv=document.getElementById("products");
+function renderProducts(filter=""){
+  productsDiv.innerHTML="";
+  const filtered = PRODUCTS.filter(p=>p.name.toLowerCase().includes(filter.toLowerCase()));
+  filtered.forEach(p=>{
+    const div=document.createElement("div");
+    div.className="product";
+    div.innerHTML=`
+      <img src="${p.image}" alt="${p.name}" onclick="showPreview('${p.image}')">
+      <strong>${p.name}</strong><br>
+      💎 ${p.price} Ks<br>
+      <button onclick="addToCart(${p.id})">Add to Cart</button>
+    `;
+    productsDiv.appendChild(div);
+  });
+}
+renderProducts();
+document.getElementById("searchBar").addEventListener("input", e=>renderProducts(e.target.value));
+
+// Cart Functions
+function addToCart(id){CART[id]?CART[id]++:CART[id]=1;renderCart();}
+function removeFromCart(id){delete CART[id];renderCart();}
+function renderCart(){
+  const cartDiv=document.getElementById("cart");
+  if(Object.keys(CART).length===0){cartDiv.innerHTML="Cart is empty";return;}
+  let html="";let total=0;
+  for(const id in CART){
+    const p=PRODUCTS.find(x=>x.id==id);
+    const qty=CART[id];
+    const subtotal=p.price*qty;
+    total+=subtotal;
+    html+=`${p.name} × ${qty} = ${subtotal} Ks <button class="remove-btn" onclick="removeFromCart(${id})">Remove</button><br>`;
+  }
+  html+=`<strong>Total: ${total} Ks</strong>`;
+  cartDiv.innerHTML=html;
+}
+
+// Telegram Message
+function sendTelegramMessage(message){
+  fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(message)}`)
+  .then(res=>res.json())
+  .then(data=>{
+    if(data.ok){CART={}; renderCart();}
+    else{console.error(data);}
+  })
+  .catch(err=>console.error(err));
+}
+
+// Checkout
+document.getElementById("checkout").addEventListener("click", ()=>{
+  if(Object.keys(CART).length===0) return alert("🛒 Cart is empty!");
+  const mlbbid=document.getElementById("mlbbid").value.trim();
+  const zoneid=document.getElementById("zoneid").value.trim();
+  if(!mlbbid||!zoneid) return alert("⚠️ Please fill MLBB ID and Zone ID!");
+  const wavepay=document.getElementById("wavepay").value.trim();
+  const kpay=document.getElementById("kpay").value.trim();
+  const note=document.getElementById("chatNote").value.trim();
+  const cartItems=Object.entries(CART).map(([id,qty])=>{
+    const p=PRODUCTS.find(x=>x.id==id);
+    return`• ${p.name} × ${qty} = ${p.price*qty} Ks`;
+  }).join("\n");
+  const total=Object.entries(CART).reduce((sum,[id,qty])=>{
+    const p=PRODUCTS.find(x=>x.id==id);return sum+p.price*qty;
+  },0);
+  
+  const message=`🎮 MLBB Diamonds Order\n\n${cartItems}\n\n💰 Total: ${total} Ks\n🆔 MLBB ID: ${mlbbid}\n🌍 Zone ID: ${zoneid}\n📱 WavePay: ${wavepay}\n📱 KBZPay: ${kpay}\n💬 Note: ${note||"None"}`;
+  sendTelegramMessage(message);
+  alert("✅ Order sent to Telegram!");
+});
+
+// Chat box
+const chatMessagesDiv=document.getElementById("chatMessages");
+function sendChat(){
+  const input=document.getElementById("msgInput");
+  const text=input.value.trim();
+  if(!text)return;
+  const msgDiv=document.createElement("div");
+  msgDiv.textContent="You: "+text;
+  chatMessagesDiv.appendChild(msgDiv);
+  chatMessagesDiv.scrollTop=chatMessagesDiv.scrollHeight;
+  sendTelegramMessage("💬 Chat from visitor: "+text);
+  input.value="";
+}
+
+// Copy function
+function copyToClipboard(text){
+  navigator.clipboard.writeText(text).then(()=>alert("Copied: "+text));
+}
+
+// Image preview
+function showPreview(src){
+  document.getElementById("previewImg").src=src;
+  document.getElementById("previewOverlay").style.display="flex";
+}
+function hidePreview(){document.getElementById("previewOverlay").style.display="none";}
+</script>
+
+</body>
+</html>
