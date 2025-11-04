@@ -3,119 +3,42 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CeleShop MLBB Diamonds</title>
+<title>MLBB Diamonds Shop</title>
 <style>
 body { font-family: Arial; padding: 20px; background: #f0f2f5; color: #333; }
 h1,h2{text-align:center;}
-#searchBar{
-  display:block;
-  margin:0 auto 20px;
-  width:50%;
-  padding:10px;
-  font-size:16px;
-  border-radius:5px;
-  border:1px solid #ccc;
-  max-width:400px;
-}
-#products{
-  display:grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 15px;
-  justify-items:center;
-}
+#searchBar{display:block;margin:0 auto 20px;width:50%;padding:10px;font-size:16px;border-radius:5px;border:1px solid #ccc; max-width:400px;}
+#products{display:flex;flex-wrap: wrap; justify-content:center;}
 .product{
-  width:100%;
+  width: 45%;
+  max-width: 200px;
   border:1px solid #ccc;
   border-radius:10px;
   padding:15px;
+  margin:10px;
   background:#fff;
   box-shadow:0 2px 5px rgba(0,0,0,0.1);
   transition:transform 0.2s, box-shadow 0.2s;
   text-align:center;
 }
-.product:hover{
-  transform:translateY(-5px);
-  box-shadow:0 5px 15px rgba(0,0,0,0.2);
-}
-.product img{
-  width:100%;
-  height:160px;
-  object-fit:cover;
-  margin-bottom:5px;
-  border-radius:5px;
-  cursor:pointer;
-}
-button{
-  padding:5px 10px;
-  margin-top:5px;
-  cursor:pointer;
-  border:none;
-  border-radius:5px;
-  background:#007bff;
-  color:white;
-  transition:background 0.2s;
-}
+.product:hover{transform:translateY(-5px);box-shadow:0 5px 15px rgba(0,0,0,0.2);}
+.product img{width:100%; height:160px; object-fit:cover; margin-bottom:5px; border-radius:5px; cursor:pointer;}
+button{padding:5px 10px;margin-top:5px;cursor:pointer;border:none;border-radius:5px;background:#007bff;color:white;transition:background 0.2s;}
 button:hover{background:#0056b3;}
-#cart{
-  border:2px solid #007bff;
-  border-radius:10px;
-  padding:15px;
-  margin-top:20px;
-  background:#e7f1ff;
-  max-width:500px;
-  margin-left:auto;
-  margin-right:auto;
-}
-#checkout{
-  display:block;
-  margin:20px auto;
-  font-size:16px;
-  font-weight:bold;
-  background:#28a745;
-}
+#cart{border:2px solid #007bff;border-radius:10px;padding:15px;margin-top:20px;background:#e7f1ff;max-width:500px;margin-left:auto;margin-right:auto;}
+#checkout{display:block;margin:20px auto;font-size:16px;font-weight:bold;background:#28a745;}
 #checkout:hover{background:#1e7e34;}
 .remove-btn{background:#dc3545;margin-left:10px;}
 .remove-btn:hover{background:#a71d2a;}
-#paymentInfo{
-  max-width:500px;
-  margin:20px auto;
-  padding:15px;
-  border:2px solid #007bff;
-  border-radius:10px;
-  background:#fff;
-}
-#paymentInfo input, #paymentInfo textarea{
-  width:100%;
-  padding:8px;
-  margin:5px 0 10px;
-  border-radius:5px;
-  border:1px solid #ccc;
-}
-#paymentInfo .clickable{
-  color:#007bff;
-  cursor:pointer;
-  text-decoration:underline;
-}
-#previewOverlay{
-  display:none;
-  position:fixed;
-  top:0; left:0;
-  width:100%; height:100%;
-  background:rgba(0,0,0,0.8);
-  justify-content:center;
-  align-items:center;
-  z-index:999;
-}
-#previewOverlay img{
-  max-width:90%;
-  max-height:90%;
-  border-radius:10px;
-}
-
-/* Mobile adjustments */
-@media (max-width: 600px){
-  #searchBar{ width:90%; }
-  #products{ grid-template-columns: 1fr; }
+#paymentInfo{max-width:500px;margin:20px auto;padding:15px;border:2px solid #007bff;border-radius:10px;background:#fff;}
+#paymentInfo input, #paymentInfo textarea{width:100%;padding:8px;margin:5px 0 10px;border-radius:5px;border:1px solid #ccc;}
+#paymentInfo .clickable{color:#007bff;cursor:pointer;text-decoration:underline;}
+#previewOverlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);justify-content:center;align-items:center;z-index:999;}
+#previewOverlay img{max-width:90%;max-height:90%;border-radius:10px;}
+@media (max-width: 600px) {
+  #products { flex-direction: column; align-items: center; }
+  .product { width: 90%; max-width: 300px; }
+  #searchBar { width: 90%; }
 }
 </style>
 </head>
@@ -152,33 +75,29 @@ button:hover{background:#0056b3;}
 
 <button id="checkout">💰 ဝယ်မယ် (Buy Now)</button>
 
-<!-- Image Preview -->
 <div id="previewOverlay" onclick="hidePreview()">
   <img id="previewImg" src="">
 </div>
 
 <script>
-// Telegram Info
 const BOT_TOKEN = "8418532957:AAF7zhJn9vCf2mSSqBjXIvfS5HRfHTqvY5M";
 const CHAT_ID = "1733081075";
 
-// MLBB Diamond Packages
 const PRODUCTS = [
-  {id:1, name:"86 Diamonds", price:2800, image:"images/mlbb1.jpg"},
-  {id:2, name:"170 Diamonds", price:5600, image:"images/mlbb2.jpg"},
-  {id:3, name:"257 Diamonds", price:8200, image:"images/mlbb3.jpg"},
-  {id:4, name:"344 Diamonds", price:10900, image:"images/mlbb4.jpg"},
-  {id:5, name:"429 Diamonds", price:13600, image:"images/mlbb5.jpg"},
-  {id:6, name:"514 Diamonds", price:16200, image:"images/mlbb6.jpg"},
-  {id:7, name:"600 Diamonds", price:18800, image:"images/mlbb7.jpg"},
-  {id:8, name:"706 Diamonds", price:21800, image:"images/mlbb8.jpg"},
-  {id:9, name:"878 Diamonds", price:26500, image:"images/mlbb9.jpg"},
-  {id:10, name:"1000 Diamonds", price:29900, image:"images/mlbb10.jpg"},
+  {id:1, name:"86 Diamonds", price:2800, image:"https://via.placeholder.com/200x160?text=86+Diamonds"},
+  {id:2, name:"170 Diamonds", price:5600, image:"https://via.placeholder.com/200x160?text=170+Diamonds"},
+  {id:3, name:"257 Diamonds", price:8200, image:"https://via.placeholder.com/200x160?text=257+Diamonds"},
+  {id:4, name:"344 Diamonds", price:10900, image:"https://via.placeholder.com/200x160?text=344+Diamonds"},
+  {id:5, name:"429 Diamonds", price:13600, image:"https://via.placeholder.com/200x160?text=429+Diamonds"},
+  {id:6, name:"514 Diamonds", price:16200, image:"https://via.placeholder.com/200x160?text=514+Diamonds"},
+  {id:7, name:"600 Diamonds", price:18800, image:"https://via.placeholder.com/200x160?text=600+Diamonds"},
+  {id:8, name:"706 Diamonds", price:21800, image:"https://via.placeholder.com/200x160?text=706+Diamonds"},
+  {id:9, name:"878 Diamonds", price:26500, image:"https://via.placeholder.com/200x160?text=878+Diamonds"},
+  {id:10, name:"1000 Diamonds", price:29900, image:"https://via.placeholder.com/200x160?text=1000+Diamonds"},
 ];
 
 let CART={};
 
-// Render Products
 const productsDiv=document.getElementById("products");
 function renderProducts(filter=""){
   productsDiv.innerHTML="";
@@ -198,7 +117,6 @@ function renderProducts(filter=""){
 renderProducts();
 document.getElementById("searchBar").addEventListener("input", e=>renderProducts(e.target.value));
 
-// Cart Functions
 function addToCart(id){CART[id]?CART[id]++:CART[id]=1;renderCart();}
 function removeFromCart(id){delete CART[id];renderCart();}
 function renderCart(){
@@ -216,18 +134,6 @@ function renderCart(){
   cartDiv.innerHTML=html;
 }
 
-// Telegram Message
-function sendTelegramMessage(message){
-  fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(message)}`)
-  .then(res=>res.json())
-  .then(data=>{
-    if(data.ok){CART={}; renderCart();}
-    else{console.error(data);}
-  })
-  .catch(err=>console.error(err));
-}
-
-// Checkout
 document.getElementById("checkout").addEventListener("click", ()=>{
   if(Object.keys(CART).length===0) return alert("🛒 Cart is empty!");
   const mlbbid=document.getElementById("mlbbid").value.trim();
@@ -243,17 +149,13 @@ document.getElementById("checkout").addEventListener("click", ()=>{
   const total=Object.entries(CART).reduce((sum,[id,qty])=>{
     const p=PRODUCTS.find(x=>x.id==id);return sum+p.price*qty;
   },0);
-  
   const message=`🎮 MLBB Diamonds Order\n\n${cartItems}\n\n💰 Total: ${total} Ks\n🆔 MLBB ID: ${mlbbid}\n🌍 Zone ID: ${zoneid}\n📱 WavePay: ${wavepay}\n📱 KBZPay: ${kpay}\n💬 Note: ${note||"None"}`;
-  sendTelegramMessage(message);
-  alert("✅ Order sent to Telegram!");
+  fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(message)}`)
+  .then(res=>res.json()).then(data=>{ if(data.ok){CART={}; renderCart(); alert("✅ Order sent to Telegram!"); } else console.error(data); }).catch(err=>console.error(err));
 });
 
-// Copy function
 function copyToClipboard(text){navigator.clipboard.writeText(text).then(()=>alert("Copied: "+text));}
-
-// Image preview
-function showPreview(src){document.getElementById("previewImg").src=src;document.getElementById("previewOverlay").style.display="flex";}
+function showPreview(src){document.getElementById("previewImg").src=src; document.getElementById("previewOverlay").style.display="flex";}
 function hidePreview(){document.getElementById("previewOverlay").style.display="none";}
 </script>
 
