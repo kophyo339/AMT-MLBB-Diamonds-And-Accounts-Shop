@@ -7,40 +7,115 @@
 <style>
 body { font-family: Arial; padding: 20px; background: #f0f2f5; color: #333; }
 h1,h2{text-align:center;}
-#searchBar{display:block;margin:0 auto 20px;width:50%;padding:10px;font-size:16px;border-radius:5px;border:1px solid #ccc; max-width:400px;}
-#products{display:flex;flex-wrap: wrap; justify-content:center;}
+#searchBar{
+  display:block;
+  margin:0 auto 20px;
+  width:50%;
+  padding:10px;
+  font-size:16px;
+  border-radius:5px;
+  border:1px solid #ccc;
+  max-width:400px;
+}
+#products{
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 15px;
+  justify-items:center;
+}
 .product{
-  width: 45%;
-  max-width: 200px;
+  width:100%;
   border:1px solid #ccc;
   border-radius:10px;
   padding:15px;
-  margin:10px;
   background:#fff;
   box-shadow:0 2px 5px rgba(0,0,0,0.1);
   transition:transform 0.2s, box-shadow 0.2s;
   text-align:center;
 }
-.product:hover{transform:translateY(-5px);box-shadow:0 5px 15px rgba(0,0,0,0.2);}
-.product img{width:100%; height:160px; object-fit:cover; margin-bottom:5px; border-radius:5px; cursor:pointer;}
-button{padding:5px 10px;margin-top:5px;cursor:pointer;border:none;border-radius:5px;background:#007bff;color:white;transition:background 0.2s;}
+.product:hover{
+  transform:translateY(-5px);
+  box-shadow:0 5px 15px rgba(0,0,0,0.2);
+}
+.product img{
+  width:100%;
+  height:160px;
+  object-fit:cover;
+  margin-bottom:5px;
+  border-radius:5px;
+  cursor:pointer;
+}
+button{
+  padding:5px 10px;
+  margin-top:5px;
+  cursor:pointer;
+  border:none;
+  border-radius:5px;
+  background:#007bff;
+  color:white;
+  transition:background 0.2s;
+}
 button:hover{background:#0056b3;}
-#cart{border:2px solid #007bff;border-radius:10px;padding:15px;margin-top:20px;background:#e7f1ff;max-width:500px;margin-left:auto;margin-right:auto;}
-#checkout{display:block;margin:20px auto;font-size:16px;font-weight:bold;background:#28a745;}
+#cart{
+  border:2px solid #007bff;
+  border-radius:10px;
+  padding:15px;
+  margin-top:20px;
+  background:#e7f1ff;
+  max-width:500px;
+  margin-left:auto;
+  margin-right:auto;
+}
+#checkout{
+  display:block;
+  margin:20px auto;
+  font-size:16px;
+  font-weight:bold;
+  background:#28a745;
+}
 #checkout:hover{background:#1e7e34;}
 .remove-btn{background:#dc3545;margin-left:10px;}
 .remove-btn:hover{background:#a71d2a;}
-#paymentInfo{max-width:500px;margin:20px auto;padding:15px;border:2px solid #007bff;border-radius:10px;background:#fff;}
-#paymentInfo input, #paymentInfo textarea{width:100%;padding:8px;margin:5px 0 10px;border-radius:5px;border:1px solid #ccc;}
-#paymentInfo .clickable{color:#007bff;cursor:pointer;text-decoration:underline;}
-#previewOverlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);justify-content:center;align-items:center;z-index:999;}
-#previewOverlay img{max-width:90%;max-height:90%;border-radius:10px;}
+#paymentInfo{
+  max-width:500px;
+  margin:20px auto;
+  padding:15px;
+  border:2px solid #007bff;
+  border-radius:10px;
+  background:#fff;
+}
+#paymentInfo input, #paymentInfo textarea{
+  width:100%;
+  padding:8px;
+  margin:5px 0 10px;
+  border-radius:5px;
+  border:1px solid #ccc;
+}
+#paymentInfo .clickable{
+  color:#007bff;
+  cursor:pointer;
+  text-decoration:underline;
+}
+#previewOverlay{
+  display:none;
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.8);
+  justify-content:center;
+  align-items:center;
+  z-index:999;
+}
+#previewOverlay img{
+  max-width:90%;
+  max-height:90%;
+  border-radius:10px;
+}
 
-/* Responsive for mobile */
-@media (max-width: 600px) {
-  #products { flex-direction: column; align-items: center; }
-  .product { width: 90%; max-width: 300px; }
-  #searchBar { width: 90%; }
+/* Mobile adjustments */
+@media (max-width: 600px){
+  #searchBar{ width:90%; }
+  #products{ grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -175,15 +250,10 @@ document.getElementById("checkout").addEventListener("click", ()=>{
 });
 
 // Copy function
-function copyToClipboard(text){
-  navigator.clipboard.writeText(text).then(()=>alert("Copied: "+text));
-}
+function copyToClipboard(text){navigator.clipboard.writeText(text).then(()=>alert("Copied: "+text));}
 
 // Image preview
-function showPreview(src){
-  document.getElementById("previewImg").src=src;
-  document.getElementById("previewOverlay").style.display="flex";
-}
+function showPreview(src){document.getElementById("previewImg").src=src;document.getElementById("previewOverlay").style.display="flex";}
 function hidePreview(){document.getElementById("previewOverlay").style.display="none";}
 </script>
 
